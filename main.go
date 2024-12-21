@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 )
 
 func main() {
@@ -25,12 +26,24 @@ func main() {
 
 	projectName := name
 
+	createOutDirectory()
+
 	if docker {
 		createDockerFile(projectName)
 	}
 
 	if make {
 		createMakefile(projectName)
+	}
+}
+
+func createOutDirectory() {
+	newpath := filepath.Join(".", "out")
+	err := os.MkdirAll(newpath, os.ModePerm)
+
+	if err != nil {
+		fmt.Printf("Unable to create out directory: %v", err)
+		panic(err)
 	}
 }
 
@@ -53,7 +66,7 @@ ENTRYPOINT ["./app/%s"]
 
 	`, projectName, projectName)
 
-	e := os.WriteFile("Dockerfile", []byte(baseDockerfile), 0755)
+	e := os.WriteFile("out/Dockerfile", []byte(baseDockerfile), 0755)
 	if e != nil {
 		fmt.Printf("Unable to create Dockerfile: %v", e)
 	}
@@ -106,7 +119,7 @@ docker-pg:
 
 	`, projectName, projectName)
 
-	e := os.WriteFile("Makefile", []byte(baseMakefile), 0755)
+	e := os.WriteFile("out/Makefile", []byte(baseMakefile), 0755)
 	if e != nil {
 		fmt.Printf("Unable to create Dockerfile: %v", e)
 	}
