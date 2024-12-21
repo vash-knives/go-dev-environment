@@ -45,13 +45,13 @@ RUN go mod download && go mod verify
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -v -o /usr/local/bin/kbgbs ./cmd/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -v -o /usr/local/bin/%s ./cmd/main.go
 
 EXPOSE 8333
 
 ENTRYPOINT ["./app/%s"]
 
-	`, projectName)
+	`, projectName, projectName)
 
 	e := os.WriteFile("Dockerfile", []byte(baseDockerfile), 0755)
 	if e != nil {
@@ -76,7 +76,7 @@ build:
 
 docker-run:
 	@docker run --rm --name ${DOCKER_IMAGE} \ 
-	--network=kbgbs \
+	--network=${DOCKER_NETWORK} \
 	-p 8333:8333 \
 	--env-file .env_docker \
 	-d ${DOCKER_IMAGE}
